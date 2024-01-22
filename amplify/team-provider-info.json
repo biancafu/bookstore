@@ -16,8 +16,20 @@
         "bookstore1d04b3ec": {}
       },
       "function": {
-        "processPayment": {},
-        "createOrder": {}
+        "processPayment": {
+          "deploymentBucketName": "amplify-bookstore-dev-231948-deployment",
+          "s3Key": "amplify-builds/processPayment-476d51654c4263544467-build.zip"
+        },
+        "createOrder": {
+          "deploymentBucketName": "amplify-bookstore-dev-231948-deployment",
+          "s3Key": "amplify-builds/createOrder-35794868397563722f59-build.zip"
+        }
+      },
+      "storage": {
+        "bookstore": {}
+      },
+      "api": {
+        "bookstore": {}
       }
     }
   }

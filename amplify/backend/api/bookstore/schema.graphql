@@ -17,13 +17,12 @@ type Book
   author: String
   featured: Boolean
   price: Float
-  orders: [BookOrder] @connection(keyName: "byBook", fields: ["id"])
+  orders: [BookOrder] @hasMany
 }
+#book will have multiple orders, using byBook connecting to bookOrder table (field in book order table)
 
 type BookOrder
   @model(queries: null, subscriptions: null)
-  @key(name: "byBook", fields: ["book_id", "order_id"])
-  @key(name: "byOrder", fields: ["order_id", "book_id"])
   @auth(
     rules: [
       # allow admins to create bookorders for customers by using customer email in lambda
@@ -32,11 +31,16 @@ type BookOrder
     ]
   ) {
   id: ID!
-  book_id: ID!
-  order_id: ID!
-  book: Book @connection(fields: ["book_id"])
-  order: Order @connection(fields: ["order_id"])
+  book_id: ID! @index(name: "byBook", sortKeyFields: ["order_id"])
+  order_id: ID! @index(name: "byOrder", sortKeyFields: ["book_id"])
+  book: Book @belongsTo
+  order: Order @belongsTo
 }
+#book order table will allow us to develop these 2 features:
+#with book order, users can view previous orders (becuz user can have many orders)
+#from admin panel, u can look up all orders from all users
+#to set up these relationships, we use @connection
+
 
 type Order
   @model(subscriptions: null)
@@ -48,14 +52,15 @@ type Order
       { allow: groups, groups: ["Admin"] }
     ]
   )
-  @key(name: "byUser", fields: ["user"]) {
+  {
   id: ID!
-  user: String!
+  user: String! @index(name: "byUser")
   date: String
   total: Float
-  books: [BookOrder] @connection(keyName: "byOrder", fields: ["id"])
+  books: [BookOrder] @hasMany
 }
 #use @connection directive to create a many to many relationship between books to orders
+#using byOrder connecting to bookOrder table (field in book order table)
 
 enum OrderStatus {
   SUCCESS
@@ -83,3 +88,4 @@ type Mutation {
     @function(name: "processPayment-${env}")
     @function(name: "createOrder-${env}")
 }
+ 
